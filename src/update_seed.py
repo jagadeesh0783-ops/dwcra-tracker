@@ -1,0 +1,189 @@
+import re
+
+data = """Rama,Chllyyamma tamarana,01160210011010100202
+Rama,Demudamma Tamarana,01160210011010100203
+Rama,Demuduamma lalam,01160210011010100204
+Rama,Demudamma paila,01160210011010100205
+Rama,Ramanamma lalam,01160210011010100206
+Rama,Lakshmi paila,01160210011010100207
+Rama,Achiyyamma tamarana,01160210011010100209
+Rama,Santhi pyla,01160210011010100210
+Rama,Ramalaxmi Reddi,01160210011010100211
+Rama,PylaBhavani Pyla,01160210011010100212
+Rama,suneetha tamirana,01160210011010100213
+Sri Anjaneya,Ammaji Pyla,01160210011020100201
+Sri Anjaneya,Ashalatha Kotani,01160210011020100202
+Sri Anjaneya,Kumari Bandaru,01160210011020100203
+Sri Anjaneya,Manga Reddi,01160210011020100205
+Sri Anjaneya,Neelamani Bailapudi,01160210011020100207
+Sri Anjaneya,Sarojani Lalam,01160210011020100208
+Sri Anjaneya,Venkatalakshmi Bandaru,01160210011020100209
+Sri Anjaneya,Venkati Lalam,01160210011020100210
+Sri Anjaneya,PylaPriyanka Pyla,01160210011020100211
+Sri Anjaneya,PAILA HEMA PAILA,01160210011020100212
+SRI CHODAMAMBICA SHG,Pyla Laksmi PYLA,01160210011010101301
+SRI CHODAMAMBICA SHG,RONGALI JYOTHI RONGALI,01160210011010101302
+SRI CHODAMAMBICA SHG,Kundrapu Devi KUNDRAPU,01160210011010101303
+SRI CHODAMAMBICA SHG,PYLA LAXMI PYLA,01160210011010101304
+SRI CHODAMAMBICA SHG,Paila Aruna Kumari PAILA,01160210011010101305
+SRI CHODAMAMBICA SHG,PYLA SAROJINI PALA,01160210011010101307
+SRI CHODAMAMBICA SHG,Kundrapu Ramadevi KUNDRAPU,01160210011010101308
+SRI CHODAMAMBICA SHG,Kundrapu Ramadevi KUNDRAPU,01160210011010101309
+SRI CHODAMAMBICA SHG,PYLA DEVI PYLA,01160210011010101310
+SRI DURGA DEVI SHG,CHINTHALLI THAMARANA,01160210011020100302
+SRI DURGA DEVI SHG,VIJAYA THAMARANA,01160210011020100310
+SRI DURGA DEVI SHG,Reddi Ammaji REDDI,01160210011020100311
+SRI DURGA DEVI SHG,Kotani Venkatasravani KOTANI,01160210011020100312
+SRI DURGA DEVI SHG,RAMYA lalam,01160210011020100314
+SRI DURGA DEVI SHG,VARALAXMI lalam,01160210011020100316
+SRI DURGA DEVI SHG,VIJAYA pyla,01160210011020100317
+SRI DURGA DEVI SHG,SANDHYA thamarana,01160210011020100315
+SRI DURGA DEVI SHG,BADHRA KALI LAVANYA kondapalli,01160210011020100313
+SRI DURGA DEVI SHG,Sirsha Reddi,01160210011020100318
+Sri Kanaka Durga,Devudamma pyla,01160210011010101104
+Sri Kanaka Durga,Devudamma pyla,01160210011010101105
+Sri Kanaka Durga,Sanyasamma paila,01160210011010101106
+Sri Kanaka Durga,Laxmi reddi,01160210011010101107
+Sri Kanaka Durga,Simhachalam pyla,01160210011010101108
+Sri Kanaka Durga,Krishnaveni pyla,01160210011010101109
+Sri Kanaka Durga,PAILA CHANTI PAILA,01160210011010101116
+Sri Kanaka Durga,RUTHALA LAKSHMI RUTHALA,01160210011010101117
+Sri Kanaka Durga,RAMANAMMA kolli,01160210011010101121
+Sri Kanaka Durga,NAGAMANI Dasari,01160210011010101120
+Krishna,Lakshmi lalam,01160210011010100301
+Krishna,Lakshmi palia,01160210011010100302
+Krishna,Yerryyamma reddi,01160210011010100303
+Krishna,Sanyasama tamarana,01160210011010100304
+Krishna,Ramulamma bandaru,01160210011010100305
+Krishna,Varalakshmi paila,01160210011010100306
+Krishna,Savitri dasari,01160210011010100307
+Krishna,Varalakshmi paila,01160210011010100308
+Krishna,navya paila,01160210011010100311
+Krishna,paila padmalatha paila,01160210011010100312
+PARIPALAMMA SHG,DEMUDAMMA KUNDRAPU,01160210011020100403
+PARIPALAMMA SHG,KRISHNAVENI PAILA,01160210011020100404
+PARIPALAMMA SHG,KRISHNAVENI PAILA,01160210011020100405
+PARIPALAMMA SHG,LAXMI RONGALI,01160210011020100406
+PARIPALAMMA SHG,LAXMI PAILA,01160210011020100408
+PARIPALAMMA SHG,PADMA PAILA,01160210011020100409
+PARIPALAMMA SHG,SOMULAMMA PAILA,01160210011020100411
+PARIPALAMMA SHG,SYAMALA RONGALI,01160210011020100413
+Sri Lakshmana,Lakshmi ruttula,01160210011010100701
+Sri Lakshmana,Parvathi lalam,01160210011010100702
+Sri Lakshmana,Devi tamarana,01160210011010100703
+Sri Lakshmana,Ramani tamarana,01160210011010100704
+Sri Lakshmana,Pailaramoji paila,01160210011010100706
+Sri Lakshmana,Kumari lalam,01160210011010100707
+Sri Lakshmana,Chandramma tamarana,01160210011010100708
+Sri Lakshmana,Krishnamma lalam,01160210011010100709
+Sri Lakshmana,Kondamma paila,01160210011010100710
+Sri Lakshmana,Sarmjini Reddi,01160210011010100711
+Sri Vinayaka,Paiditalli reddy,01160210011010100802
+Sri Vinayaka,Yerayyamma reddy,01160210011010100803
+Sri Vinayaka,Gangamma lalam,01160210011010100806
+Sri Vinayaka,Devudamma bandaru,01160210011010100808
+Sri Vinayaka,Demudamma kundrapu,01160210011010100809
+Sri Vinayaka,Bhavanani Pyla,01160210011010100810
+Sri Vinayaka,Lalam Sunitha LALAM,01160210011010100812
+Sri Vinayaka,SRUTHI ruttala,01160210011010100816
+Sri Vinayaka,Ramalakshmi Puliga,01160210011010100817
+Sri Vinayaka,ROSINI MASARAPU,01160210011010100818
+Sri Vinayaka,KOTA DIVYA BHARATHI KOTA,01160210011010100819
+Sri Sita,Laxmi paila,01160210011010101003
+Sri Sita,Paiditalli paila,01160210011010101004
+Sri Sita,Jayalakshmi paila,01160210011010101005
+Sri Sita,Sathyavathi paila,01160210011010101006
+Sri Sita,Kalyani paila,01160210011010101007
+Sri Sita,Adilakshmi reddi,01160210011010101008
+Sri Sita,Nookaratnam Lalam,01160210011010101009
+Sri Sita,Demudamma paila,01160210011010101010
+Sri Sita,saroja pyla,01160210011010101011
+Sri Sita,rongaliasravani rongala,01160210011010101012
+Sri Sita,Pushpa Reddi,01160210011010101013
+Sri Santhoshimatha,Paiditalli tamarana,01160210011010100601
+Sri Santhoshimatha,Sanyasamma tamarana,01160210011010100603
+Sri Santhoshimatha,Kumari tamarana,01160210011010100604
+Sri Santhoshimatha,Demudamma reddi,01160210011010100605
+Sri Santhoshimatha,Ramanamma tamarana,01160210011010100606
+Sri Santhoshimatha,Devudamma paila,01160210011010100607
+Sri Santhoshimatha,Devi tamarana,01160210011010100608
+Sri Santhoshimatha,Padma tamarana,01160210011010100610
+Sri Santhoshimatha,Adigarlajyothi Adigarla,01160210011010100611
+Sri Santhoshimatha,SAROJA kundrapu,01160210011010100612
+Sri Santhoshimatha,SUDHARANI thamirana,01160210011010100613
+Sri Santhoshimatha,varalakshmi Tamarana,01160210011010100614
+Sri Manikanta,Varalakshmi bailapudi,01160210011010100901
+Sri Manikanta,Chittamma Tamarana,01160210011010100902
+Sri Manikanta,Reddy paila,01160210011010100903
+Sri Manikanta,Varalakshmi kandregula,01160210011010100904
+Sri Manikanta,Devi Rongala,01160210011010100907
+Sri Manikanta,Ramani Adigarla,01160210011010100913
+Sri Manikanta,Pyla Venkata Laxmi PYLA,01160210011010100920
+Sri Manikanta,ARUNA rongala,01160210011010100923
+Sri Manikanta,SATYAVATHI reddy,01160210011010100925
+Sri Manikanta,chittamma tamarana,01160210011010100926
+SRI LAKSHMI SHG,Annamreddy Suneetha annamreddy,01160210011010102101
+SRI LAKSHMI SHG,MATHALA KUMARI mathala,01160210011010102102
+SRI LAKSHMI SHG,Karri Devi karri,01160210011010102103
+SRI LAKSHMI SHG,Gandi Rohini gandi,01160210011010102105
+SRI LAKSHMI SHG,KOLLI VENKATALAKSHMI kolli,01160210011010102106
+SRI LAKSHMI SHG,Saritha pyla,01160210011010102107
+SRI LAKSHMI SHG,Yalla Neeraja yalla,01160210011010102109
+SRI LAKSHMI SHG,Ramadavi Gelli,01160210011010102110
+SRI LAKSHMI SHG,Manju Reddi,01160210011010102111
+SRI LAKSHMI SHG,THARALA RAJESARI THAMARALA,01160210011010102112
+Paripillamma l,Varahalamma lalam,01160210011010100401
+Paripillamma l,Chinatalli reddi,01160210011010100402
+Paripillamma l,Devudamma reddi,01160210011010100403
+Paripillamma l,Lakshmi reddi,01160210011010100404
+Paripillamma l,Muthyalama bandaru,01160210011010100405
+Paripillamma l,Sanyasamma reddi,01160210011010100406
+Paripillamma l,Ramulamma Reddi,01160210011010100407
+Paripillamma l,Devudamma reddi,01160210011010100408
+Paripillamma l,Devudamma reddy,01160210011010100409
+Paripillamma l,Ramulamma reddy,01160210011010100411
+Paripillamma l,RAMADEVI reddy,01160210011010100412
+Paripillamma l,Satyavathi Boddu,01160210011010100413
+Paripillamma,Chittamma tamarana,01160218023010102002
+Paripillamma,Papa ruthula,01160218023010102005
+Paripillamma,Papa reddy,01160218023010102006
+Paripillamma,Somulamma reddy,01160218023010102008
+Paripillamma,Arunasri A Parvathi Lalam,01160218023010102011
+Paripillamma,Chinnammalu Paila,01160218023010102012
+Paripillamma,Nagalakshmi Ruttala,01160218023010102013
+Paripillamma,Nagamani Paila,01160218023010102014
+Paripillamma,Tulasi Paila,01160218023010102015
+Paripillamma,Naayanamma Narayanamma,01160218023010102018
+Maridimamba,Venkata kundra,01160210011010100101
+Maridimamba,Shivalakshmi kotana,01160210011010100102
+Maridimamba,Ratnam sabbavarapu,01160210011010100104
+Maridimamba,Satyavati paila,01160210011010100105
+Maridimamba,Achiyamma paila,01160210011010100106
+Maridimamba,Sanyasamma tamarana,01160210011010100107
+Maridimamba,Lakshmi tamarana,01160210011010100108
+Maridimamba,Ramathalli tamarana,01160210011010100110
+Maridimamba,Nookalamma kundrapui,01160210011010100112
+Maridimamba,Sireesha Lalam,01160210011010100113"""
+
+lines = [line.strip() for line in data.strip().split('\\n')]
+
+json_str = '    const dummyDataToImport = [\\n'
+for i, line in enumerate(lines):
+    parts = line.split(',')
+    group = parts[0].strip()
+    name = parts[1].strip()
+    comma = ',' if i < len(lines)-1 else ''
+    json_str += f'      {{ group: "{group}", name: "{name}" }}{comma}\\n'
+json_str += '    ];'
+
+with open('App.jsx', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+pattern = r'    const dummyDataToImport = \[.*?\];'
+# Using lambda prevents re.sub from parsing backslashes in the replacement string
+content = re.sub(pattern, lambda m: json_str.replace('\\n', '\n'), content, flags=re.DOTALL)
+
+with open('App.jsx', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f"Fixed App.jsx with {len(lines)} records!")
