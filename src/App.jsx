@@ -191,6 +191,8 @@ export default function App() {
   const [dbError, setDbError] = useState(false);
   const [methodDetailsModal, setMethodDetailsModal] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(currentMonthKey);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showUnpaidOnly, setShowUnpaidOnly] = useState(false);
 
   useEffect(() => {
     try {
@@ -404,34 +406,70 @@ export default function App() {
                   <option value="">-- View All Groups --</option>
                   {UNIQUE_GROUPS.map(group => <option key={group} value={group}>{group}</option>)}
                 </select>
+                
+                <input 
+                  type="text" 
+                  placeholder="🔍 Search member by name..." 
+                  className="form-input" 
+                  style={{ marginTop: '12px' }}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={showUnpaidOnly}
+                    onChange={(e) => setShowUnpaidOnly(e.target.checked)}
+                    style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }}
+                  />
+                  <span>Show Unpaid Members Only ({formatMonth(selectedMonth).split(' ')[0]})</span>
+                </label>
               </div>
 
               {Object.keys(GROUPED_MEMBERS)
                 .filter(groupName => membersTabGroupFilter === '' || groupName === membersTabGroupFilter)
                 .sort()
-                .map(groupName => (
-                <div key={groupName} style={{ marginBottom: '24px' }}>
-                  <h4 style={{ color: 'var(--primary-shadow)', marginBottom: '8px', borderBottom: '2px solid rgba(99, 102, 241, 0.2)', paddingBottom: '4px' }}>
-                    {groupName} ({GROUPED_MEMBERS[groupName].length})
-                  </h4>
-                  {GROUPED_MEMBERS[groupName].sort((a,b) => a.name.localeCompare(b.name)).map(m => {
-                    const memberTxs = currentMonthTransactions.filter(t => t.memberId === m.id);
-                    const memberTotalPaid = memberTxs.reduce((sum, tx) => sum + parseFloat(tx.amount || 0), 0);
+                .map(groupName => {
+                  const filteredMembers = GROUPED_MEMBERS[groupName].sort((a,b) => a.name.localeCompare(b.name)).filter(m => {
+                    const matchesSearch = m.name.toLowerCase().includes(searchQuery.toLowerCase());
+                    if (!matchesSearch) return false;
+                    
+                    if (showUnpaidOnly) {
+                      const memberTxs = currentMonthTransactions.filter(t => t.memberId === m.id);
+                      const memberTotalPaid = memberTxs.reduce((sum, tx) => sum + parseFloat(tx.amount || 0), 0);
+                      return memberTotalPaid === 0;
+                    }
+                    
+                    return true;
+                  });
 
-                    return (
-                      <div key={m.id} className="list-item">
-                        <div className="item-main">
-                          <span className="item-title">{m.name}</span>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <span className="item-subtitle">Paid in {formatMonth(selectedMonth).split(' ')[0]}</span>
-                          <div className="item-amount amount-positive">₹{memberTotalPaid.toLocaleString()}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
+                  if (filteredMembers.length === 0) return null;
+
+                  return (
+                    <div key={groupName} style={{ marginBottom: '24px' }}>
+                      <h4 style={{ color: 'var(--primary-shadow)', marginBottom: '8px', borderBottom: '2px solid rgba(99, 102, 241, 0.2)', paddingBottom: '4px' }}>
+                        {groupName} ({filteredMembers.length})
+                      </h4>
+                      {filteredMembers.map(m => {
+                        const memberTxs = currentMonthTransactions.filter(t => t.memberId === m.id);
+                        const memberTotalPaid = memberTxs.reduce((sum, tx) => sum + parseFloat(tx.amount || 0), 0);
+
+                        return (
+                          <div key={m.id} className="list-item">
+                            <div className="item-main">
+                              <span className="item-title">{m.name}</span>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <span className="item-subtitle">Paid in {formatMonth(selectedMonth).split(' ')[0]}</span>
+                              <div className={`item-amount ${memberTotalPaid > 0 ? 'amount-positive' : ''}`} style={memberTotalPaid === 0 ? {color: '#ef4444'} : {}}>₹{memberTotalPaid.toLocaleString()}</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+              })}
             </div>
           </div>
         )}
