@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
-import { collection, onSnapshot, addDoc, orderBy, query } from 'firebase/firestore';
-import { Home, Users, ArrowLeftRight, Plus, Wallet, Landmark } from 'lucide-react';
+import { collection, onSnapshot, addDoc, orderBy, query, deleteDoc, doc } from 'firebase/firestore';
+import { Home, Users, ArrowLeftRight, Plus, Wallet, Landmark, Download, Trash } from 'lucide-react';
 
 // All 164 members hardcoded — no seeding or database needed for members
 const ALL_MEMBERS = [
@@ -180,12 +180,17 @@ const GROUPED_MEMBERS = ALL_MEMBERS.reduce((acc, m) => {
 }, {});
 
 export default function App() {
+  const currentDate = new Date();
+  const currentMonthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showAddModal, setShowAddModal] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState('');
   const [membersTabGroupFilter, setMembersTabGroupFilter] = useState('');
   const [dbError, setDbError] = useState(false);
+  const [methodDetailsModal, setMethodDetailsModal] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(currentMonthKey);
 
   useEffect(() => {
     try {
@@ -205,10 +210,24 @@ export default function App() {
     }
   }, []);
 
-  const totalCollected = transactions.reduce((sum, tx) => sum + parseFloat(tx.amount || 0), 0);
-  const cashCollected = transactions.filter(t => t.method === 'cash').reduce((s, t) => s + parseFloat(t.amount || 0), 0);
-  const momCollected = transactions.filter(t => t.method === 'mom').reduce((s, t) => s + parseFloat(t.amount || 0), 0);
-  const dadCollected = transactions.filter(t => t.method === 'dad').reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+  // Compute available months dynamically
+  const availableMonths = [...new Set([
+    currentMonthKey,
+    ...transactions.map(tx => tx.date.substring(0, 7))
+  ])].sort().reverse();
+  
+  const formatMonth = (yyyy_mm) => {
+    const [y, m] = yyyy_mm.split('-');
+    const d = new Date(y, parseInt(m) - 1);
+    return d.toLocaleString('default', { month: 'long', year: 'numeric' });
+  };
+
+  const currentMonthTransactions = transactions.filter(tx => tx.date.substring(0, 7) === selectedMonth);
+
+  const totalCollected = currentMonthTransactions.reduce((sum, tx) => sum + parseFloat(tx.amount || 0), 0);
+  const cashCollected = currentMonthTransactions.filter(t => t.method === 'cash').reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+  const momCollected = currentMonthTransactions.filter(t => t.method === 'mom').reduce((s, t) => s + parseFloat(t.amount || 0), 0);
+  const dadCollected = currentMonthTransactions.filter(t => t.method === 'dad').reduce((s, t) => s + parseFloat(t.amount || 0), 0);
 
   const membersInSelectedGroup = ALL_MEMBERS.filter(m => m.group === selectedGroup);
 
@@ -244,13 +263,55 @@ export default function App() {
     }
   };
 
+  const handleDeleteTransaction = async (id) => {
+    if (window.confirm("Are you sure you want to delete this payment?")) {
+      try {
+        await deleteDoc(doc(db, 'transactions', id));
+      } catch (error) {
+        console.error("Error deleting document: ", error);
+        alert("Failed to delete. Check database rules.");
+      }
+    }
+  };
+
+  const handleExportCSV = () => {
+    const headers = ["Date", "Group", "Member Name", "Amount (Rs)", "Payment Method"];
+    const rows = currentMonthTransactions.map(tx => {
+      const member = ALL_MEMBERS.find(m => m.id === tx.memberId);
+      const date = new Date(tx.date).toLocaleDateString();
+      const methodStr = tx.method === 'cash' ? 'Cash' : tx.method === 'mom' ? 'Mom Account' : 'Dad Account';
+      return `"${date}","${member?.group || 'Unknown'}","${member?.name || 'Unknown'}","${tx.amount}","${methodStr}"`;
+    });
+    
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `dwcra-tracker-${formatMonth(selectedMonth).replace(' ', '-')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="app-container">
       {/* Header */}
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h1>DWCRA Tracker</h1>
-          <p>Welcome back!</p>
+          <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            DWCRA Tracker
+          </h1>
+          <div style={{ marginTop: '4px' }}>
+            <select 
+              value={selectedMonth} 
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'var(--surface)', color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.9rem' }}
+            >
+              {availableMonths.map(m => (
+                <option key={m} value={m}>{formatMonth(m)}</option>
+              ))}
+            </select>
+          </div>
         </div>
         <button className="btn btn-primary" onClick={() => setShowAddModal(true)} style={{ padding: '12px', borderRadius: '50%' }}>
           <Plus size={24} />
@@ -286,7 +347,7 @@ export default function App() {
           <div>
             <div className="stats-grid">
               <div className="stat-card primary card" style={{ gridColumn: 'span 2' }}>
-                <span className="stat-label">Total Collected</span>
+                <span className="stat-label">Total Collected ({formatMonth(selectedMonth)})</span>
                 <h3>₹{totalCollected.toLocaleString()}</h3>
               </div>
               <div className="stat-card card">
@@ -299,23 +360,23 @@ export default function App() {
               </div>
             </div>
 
-            <h3 style={{ marginTop: '32px', marginBottom: '16px' }}>Collection Breakdown</h3>
+            <h3 style={{ marginTop: '32px', marginBottom: '16px' }}>Collection Breakdown (Click for details)</h3>
             <div className="card" style={{ padding: '0' }}>
-              <div className="list-item" style={{ boxShadow: 'none', marginBottom: '0', borderBottom: '1px solid var(--surface-border)' }}>
+              <div className="list-item" onClick={() => setMethodDetailsModal('cash')} style={{ boxShadow: 'none', marginBottom: '0', borderBottom: '1px solid var(--surface-border)', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ background: 'var(--success-bg)', padding: '10px', borderRadius: '12px', color: 'var(--success)' }}><Wallet size={20} /></div>
                   <span className="item-title">Cash on Hand</span>
                 </div>
                 <span className="item-amount amount-positive">₹{cashCollected.toLocaleString()}</span>
               </div>
-              <div className="list-item" style={{ boxShadow: 'none', marginBottom: '0', borderBottom: '1px solid var(--surface-border)' }}>
+              <div className="list-item" onClick={() => setMethodDetailsModal('mom')} style={{ boxShadow: 'none', marginBottom: '0', borderBottom: '1px solid var(--surface-border)', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ background: 'var(--warning-bg)', padding: '10px', borderRadius: '12px', color: 'var(--warning)' }}><Landmark size={20} /></div>
                   <span className="item-title">Mom's Account</span>
                 </div>
                 <span className="item-amount amount-positive">₹{momCollected.toLocaleString()}</span>
               </div>
-              <div className="list-item" style={{ boxShadow: 'none', marginBottom: '0' }}>
+              <div className="list-item" onClick={() => setMethodDetailsModal('dad')} style={{ boxShadow: 'none', marginBottom: '0', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '10px', borderRadius: '12px', color: '#4f46e5' }}><Landmark size={20} /></div>
                   <span className="item-title">Dad's Account</span>
@@ -354,7 +415,7 @@ export default function App() {
                     {groupName} ({GROUPED_MEMBERS[groupName].length})
                   </h4>
                   {GROUPED_MEMBERS[groupName].sort((a,b) => a.name.localeCompare(b.name)).map(m => {
-                    const memberTxs = transactions.filter(t => t.memberId === m.id);
+                    const memberTxs = currentMonthTransactions.filter(t => t.memberId === m.id);
                     const memberTotalPaid = memberTxs.reduce((sum, tx) => sum + parseFloat(tx.amount || 0), 0);
 
                     return (
@@ -363,7 +424,7 @@ export default function App() {
                           <span className="item-title">{m.name}</span>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <span className="item-subtitle">Total Paid</span>
+                          <span className="item-subtitle">Paid in {formatMonth(selectedMonth).split(' ')[0]}</span>
                           <div className="item-amount amount-positive">₹{memberTotalPaid.toLocaleString()}</div>
                         </div>
                       </div>
@@ -377,21 +438,32 @@ export default function App() {
 
         {activeTab === 'transactions' && (
           <div>
-            <h3>Recent Transactions</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3>History: {formatMonth(selectedMonth)}</h3>
+              <button onClick={handleExportCSV} className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Download size={16} /> Excel CSV
+              </button>
+            </div>
+            
             <div style={{ marginTop: '16px' }}>
-              {transactions.length === 0 ? <p>No transactions yet.</p> : transactions.map(tx => {
+              {currentMonthTransactions.length === 0 ? <p>No transactions found for {formatMonth(selectedMonth)}.</p> : currentMonthTransactions.map(tx => {
                 const member = ALL_MEMBERS.find(m => m.id === tx.memberId);
                 return (
-                  <div key={tx.id} className="list-item">
+                  <div key={tx.id} className="list-item" style={{ position: 'relative' }}>
                     <div className="item-main">
                       <span className="item-title">{member?.name || 'Unknown'}</span>
                       <span className="item-subtitle">{member?.group || ''} • {new Date(tx.date).toLocaleDateString()}</span>
                     </div>
                     <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
                       <span className="item-amount amount-positive">+₹{parseFloat(tx.amount || 0).toLocaleString()}</span>
-                      <span className={`badge badge-${tx.method}`}>
-                        {tx.method === 'cash' ? 'Cash' : tx.method === 'mom' ? "Mom's A/C" : "Dad's A/C"}
-                      </span>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span className={`badge badge-${tx.method}`}>
+                          {tx.method === 'cash' ? 'Cash' : tx.method === 'mom' ? "Mom's A/C" : "Dad's A/C"}
+                        </span>
+                        <button onClick={() => handleDeleteTransaction(tx.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }} title="Delete Payment">
+                          <Trash size={16} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -444,6 +516,44 @@ export default function App() {
               </div>
               <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '8px' }}>Save Payment</button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Method Details Modal */}
+      {methodDetailsModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'flex-end' }} onClick={() => setMethodDetailsModal(null)}>
+          <div className="card animate-fade-in" style={{ width: '100%', maxHeight: '80vh', overflowY: 'auto', borderBottomLeftRadius: 0, borderBottomRightRadius: 0, paddingBottom: '40px' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h2>
+                {methodDetailsModal === 'cash' ? 'Cash Collections' : methodDetailsModal === 'mom' ? "Mom's Account" : "Dad's Account"}
+              </h2>
+              <button className="btn btn-outline" onClick={() => setMethodDetailsModal(null)} style={{ padding: '8px', borderRadius: '50%' }}>✕</button>
+            </div>
+            
+            <div>
+              {(() => {
+                const methodTxs = currentMonthTransactions.filter(t => t.method === methodDetailsModal);
+                if (methodTxs.length === 0) return <p>No transactions found for {formatMonth(selectedMonth)}.</p>;
+                return methodTxs.map(tx => {
+                  const member = ALL_MEMBERS.find(m => m.id === tx.memberId);
+                  return (
+                    <div key={tx.id} className="list-item" style={{ padding: '12px 0' }}>
+                      <div className="item-main">
+                        <span className="item-title">{member?.name || 'Unknown'}</span>
+                        <span className="item-subtitle">{member?.group || ''} • {new Date(tx.date).toLocaleDateString()}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span className="item-amount amount-positive">+₹{parseFloat(tx.amount || 0).toLocaleString()}</span>
+                        <button onClick={() => handleDeleteTransaction(tx.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }} title="Delete Payment">
+                          <Trash size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
           </div>
         </div>
       )}
