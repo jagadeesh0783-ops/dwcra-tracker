@@ -32,8 +32,8 @@ const ALL_MEMBERS = [
   { id: "m025", group: "SRI CHODAMAMBICA SHG", name: "PYLA LAXMI PYLA" },
   { id: "m026", group: "SRI CHODAMAMBICA SHG", name: "Paila Aruna Kumari PAILA" },
   { id: "m027", group: "SRI CHODAMAMBICA SHG", name: "PYLA SAROJINI PALA" },
-  { id: "m028", group: "SRI CHODAMAMBICA SHG", name: "Kundrapu Ramadevi KUNDRAPU" },
-  { id: "m029", group: "SRI CHODAMAMBICA SHG", name: "Kundrapu Ramadevi KUNDRAPU" },
+  { id: "m028", group: "SRI CHODAMAMBICA SHG", name: "Kundrapu Ramadevi KUNDRAPU (1)" },
+  { id: "m029", group: "SRI CHODAMAMBICA SHG", name: "Kundrapu Ramadevi KUNDRAPU (2)" },
   { id: "m030", group: "SRI CHODAMAMBICA SHG", name: "PYLA DEVI PYLA" },
   { id: "m031", group: "SRI DURGA DEVI SHG", name: "CHINTHALLI THAMARANA" },
   { id: "m032", group: "SRI DURGA DEVI SHG", name: "VIJAYA THAMARANA" },
@@ -45,8 +45,8 @@ const ALL_MEMBERS = [
   { id: "m038", group: "SRI DURGA DEVI SHG", name: "SANDHYA thamarana" },
   { id: "m039", group: "SRI DURGA DEVI SHG", name: "BADHRA KALI LAVANYA kondapalli" },
   { id: "m040", group: "SRI DURGA DEVI SHG", name: "Sirsha Reddi" },
-  { id: "m041", group: "Sri Kanaka Durga", name: "Devudamma pyla" },
-  { id: "m042", group: "Sri Kanaka Durga", name: "Devudamma pyla" },
+  { id: "m041", group: "Sri Kanaka Durga", name: "Devudamma pyla (1)" },
+  { id: "m042", group: "Sri Kanaka Durga", name: "Devudamma pyla (2)" },
   { id: "m043", group: "Sri Kanaka Durga", name: "Sanyasamma paila" },
   { id: "m044", group: "Sri Kanaka Durga", name: "Laxmi reddi" },
   { id: "m045", group: "Sri Kanaka Durga", name: "Simhachalam pyla" },
@@ -60,14 +60,14 @@ const ALL_MEMBERS = [
   { id: "m053", group: "Krishna", name: "Yerryyamma reddi" },
   { id: "m054", group: "Krishna", name: "Sanyasama tamarana" },
   { id: "m055", group: "Krishna", name: "Ramulamma bandaru" },
-  { id: "m056", group: "Krishna", name: "Varalakshmi paila" },
+  { id: "m056", group: "Krishna", name: "Varalakshmi paila (1)" },
   { id: "m057", group: "Krishna", name: "Savitri dasari" },
-  { id: "m058", group: "Krishna", name: "Varalakshmi paila" },
+  { id: "m058", group: "Krishna", name: "Varalakshmi paila (2)" },
   { id: "m059", group: "Krishna", name: "navya paila" },
   { id: "m060", group: "Krishna", name: "paila padmalatha paila" },
   { id: "m061", group: "PARIPALAMMA SHG", name: "DEMUDAMMA KUNDRAPU" },
-  { id: "m062", group: "PARIPALAMMA SHG", name: "KRISHNAVENI PAILA" },
-  { id: "m063", group: "PARIPALAMMA SHG", name: "KRISHNAVENI PAILA" },
+  { id: "m062", group: "PARIPALAMMA SHG", name: "KRISHNAVENI PAILA (1)" },
+  { id: "m063", group: "PARIPALAMMA SHG", name: "KRISHNAVENI PAILA (2)" },
   { id: "m064", group: "PARIPALAMMA SHG", name: "LAXMI RONGALI" },
   { id: "m065", group: "PARIPALAMMA SHG", name: "LAXMI PAILA" },
   { id: "m066", group: "PARIPALAMMA SHG", name: "PADMA PAILA" },
@@ -118,7 +118,7 @@ const ALL_MEMBERS = [
   { id: "m111", group: "Sri Santhoshimatha", name: "SUDHARANI thamirana" },
   { id: "m112", group: "Sri Santhoshimatha", name: "varalakshmi Tamarana" },
   { id: "m113", group: "Sri Manikanta", name: "Varalakshmi bailapudi" },
-  { id: "m114", group: "Sri Manikanta", name: "Chittamma Tamarana" },
+  { id: "m114", group: "Sri Manikanta", name: "Chittamma Tamarana (1)" },
   { id: "m115", group: "Sri Manikanta", name: "Reddy paila" },
   { id: "m116", group: "Sri Manikanta", name: "Varalakshmi kandregula" },
   { id: "m117", group: "Sri Manikanta", name: "Devi Rongala" },
@@ -126,7 +126,7 @@ const ALL_MEMBERS = [
   { id: "m119", group: "Sri Manikanta", name: "Pyla Venkata Laxmi PYLA" },
   { id: "m120", group: "Sri Manikanta", name: "ARUNA rongala" },
   { id: "m121", group: "Sri Manikanta", name: "SATYAVATHI reddy" },
-  { id: "m122", group: "Sri Manikanta", name: "chittamma tamarana" },
+  { id: "m122", group: "Sri Manikanta", name: "chittamma tamarana (2)" },
   { id: "m123", group: "SRI LAKSHMI SHG", name: "Annamreddy Suneetha annamreddy" },
   { id: "m124", group: "SRI LAKSHMI SHG", name: "MATHALA KUMARI mathala" },
   { id: "m125", group: "SRI LAKSHMI SHG", name: "Karri Devi karri" },
@@ -139,12 +139,12 @@ const ALL_MEMBERS = [
   { id: "m132", group: "SRI LAKSHMI SHG", name: "THARALA RAJESARI THAMARALA" },
   { id: "m133", group: "Paripillamma l", name: "Varahalamma lalam" },
   { id: "m134", group: "Paripillamma l", name: "Chinatalli reddi" },
-  { id: "m135", group: "Paripillamma l", name: "Devudamma reddi" },
+  { id: "m135", group: "Paripillamma l", name: "Devudamma reddi (1)" },
   { id: "m136", group: "Paripillamma l", name: "Lakshmi reddi" },
   { id: "m137", group: "Paripillamma l", name: "Muthyalama bandaru" },
   { id: "m138", group: "Paripillamma l", name: "Sanyasamma reddi" },
   { id: "m139", group: "Paripillamma l", name: "Ramulamma Reddi" },
-  { id: "m140", group: "Paripillamma l", name: "Devudamma reddi" },
+  { id: "m140", group: "Paripillamma l", name: "Devudamma reddi (2)" },
   { id: "m141", group: "Paripillamma l", name: "Devudamma reddy" },
   { id: "m142", group: "Paripillamma l", name: "Ramulamma reddy" },
   { id: "m143", group: "Paripillamma l", name: "RAMADEVI reddy" },
@@ -193,6 +193,8 @@ export default function App() {
   const [selectedMonth, setSelectedMonth] = useState(currentMonthKey);
   const [searchQuery, setSearchQuery] = useState('');
   const [showUnpaidOnly, setShowUnpaidOnly] = useState(false);
+  const initialPhase = new Date().getDate() <= 15 ? 1 : 2;
+  const [selectedPhase, setSelectedPhase] = useState(initialPhase);
 
   useEffect(() => {
     try {
@@ -224,7 +226,15 @@ export default function App() {
     return d.toLocaleString('default', { month: 'long', year: 'numeric' });
   };
 
-  const currentMonthTransactions = transactions.filter(tx => tx.date.substring(0, 7) === selectedMonth);
+  const currentMonthTransactions = transactions.filter(tx => {
+    if (tx.date.substring(0, 7) !== selectedMonth) return false;
+    if (selectedPhase === 'all') return true;
+    
+    const day = new Date(tx.date).getDate();
+    if (selectedPhase === 1 && day <= 15) return true;
+    if (selectedPhase === 2 && day >= 16) return true;
+    return false;
+  });
 
   const totalCollected = currentMonthTransactions.reduce((sum, tx) => sum + parseFloat(tx.amount || 0), 0);
   const cashCollected = currentMonthTransactions.filter(t => t.method === 'cash').reduce((s, t) => s + parseFloat(t.amount || 0), 0);
@@ -303,7 +313,7 @@ export default function App() {
           <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             DWCRA Tracker
           </h1>
-          <div style={{ marginTop: '4px' }}>
+          <div style={{ marginTop: '8px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <select 
               value={selectedMonth} 
               onChange={(e) => setSelectedMonth(e.target.value)}
@@ -312,6 +322,15 @@ export default function App() {
               {availableMonths.map(m => (
                 <option key={m} value={m}>{formatMonth(m)}</option>
               ))}
+            </select>
+            <select 
+              value={selectedPhase} 
+              onChange={(e) => setSelectedPhase(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+              style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'var(--surface)', color: 'var(--text-primary)', fontWeight: 'bold', fontSize: '0.9rem' }}
+            >
+              <option value={1}>Phase 1 (1-15)</option>
+              <option value={2}>Phase 2 (16-31)</option>
+              <option value="all">Full Month</option>
             </select>
           </div>
         </div>
@@ -423,7 +442,7 @@ export default function App() {
                     onChange={(e) => setShowUnpaidOnly(e.target.checked)}
                     style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }}
                   />
-                  <span>Show Unpaid Members Only ({formatMonth(selectedMonth).split(' ')[0]})</span>
+                  <span>Show Unpaid Members Only ({formatMonth(selectedMonth).split(' ')[0]}{selectedPhase !== 'all' ? ` P${selectedPhase}` : ''})</span>
                 </label>
               </div>
 
